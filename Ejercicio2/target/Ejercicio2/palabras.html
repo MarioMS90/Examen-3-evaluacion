@@ -23,14 +23,16 @@ Palabra 3 <input type="text" id="txtPalabra3" name="txtPalabra3"/><br>
         xhr.open("POST", "PalabrasServlet", true);
         xhr.onreadystatechange = function () {
             if ((xhr.readyState == 4) && (xhr.status == 200)) {
-                var respuesta = JSON.parse(xhr.response);
+                let respuesta = JSON.parse(xhr.response);
                 if (respuesta.status === "ok") {
                     resultado.innerHTML = "<p>La concatenación de " + respuesta.palabra1 + ", " + respuesta.palabra2 + " y " + respuesta.palabra3 + " es " + respuesta.concatenacion + "</p>";
-                } else alert("Error, introduce tres palabras por favor.");
+                } else {
+                    alert("Error, introduce tres palabras por favor.");
+                }
             }
+        }
             xhr.setRequestHeader('Content-type', "application/json; charset=utf-8");
             xhr.send(JSON.stringify({palabra1: palabra1.value, palabra2: palabra2.value, palabra3: palabra3.value}));
-        }
     });
 </script>
 </html>
