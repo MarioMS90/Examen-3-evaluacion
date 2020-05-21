@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,25 +26,22 @@ public class PalabrasServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String json = req.getReader().lines().collect(Collectors.joining());
         JSONParser parser = new JSONParser();
+        List<String> palabras = new ArrayList<>();
+        String cadenaJsonResultado = "";
         try{
             JSONObject jsonRecibido = (JSONObject) parser.parse(json);
-            String nombre = (String) jsonRecibido.get("nombre");
-            int edad = Integer.parseInt((String) jsonRecibido.get("edad"));
-            listaPersonas.add(new Persona(nombre,edad));
+            palabras.add((String) jsonRecibido.get("palabra1"));
+            palabras.add((String) jsonRecibido.get("palabra2"));
+            palabras.add((String) jsonRecibido.get("palabra3"));
+            Concatenacion concatenador = new Concatenacion();
+            String concatenacion = concatenador.concatenar(palabras);
+            cadenaJsonResultado = "{\"status\":\"ok\",\"palabra1\":\"" + palabras.get(0) + "\",\"palabra2\":\"" + palabras.get(1) + "\",\"palabra3\":\"" + palabras.get(2) + "\",\"concatenacion\":\"" + concatenacion + "\"}";
         } catch(Exception e){
-            listaPersonas.add(new Persona("Nombre desconocido",0));
+            cadenaJsonResultado = "{\"status\":\"ko\"}";
+            e.printStackTrace();
         }
-        Concatenacion concatenador = new Concatenacion();
-        List<String> palabras = new ArrayList<>();
-        palabras.add(req.getParameter("palabra1"));
-        palabras.add(req.getParameter("palabra2"));
-        palabras.add(req.getParameter("palabra3"));
-        String concatenacion = concatenador.concatenar(palabras);
-        for (String palabra: palabras) {
-            req.setAttribute("palabra1", palabra);
-        }
-        req.setAttribute("concatenacion", concatenacion);
-        RequestDispatcher view = req.getRequestDispatcher("resultCerveza.jsp");
-        view.forward(req, resp);
+        PrintWriter out = resp.getWriter();
+        resp.setContentType("application/json");
+        out.print(cadenaJsonResultado);
     }
 }
